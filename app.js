@@ -443,7 +443,7 @@ function selectOption(index, optionEl) {
 
     const question = currentQuestions[currentIndex];
 
-    if (question.type === 'single') {
+    if (question.type === 'single' || question.type === 'judge') {
         selectedOptions = [index];
         document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
         optionEl.classList.add('selected');
