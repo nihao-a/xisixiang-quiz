@@ -275,7 +275,10 @@ function showQuestion() {
     const progress = (currentIndex / currentQuestions.length) * 100;
     progressFill.style.width = progress + '%';
 
-    questionTypeTag.textContent = question.type === 'single' ? '单选题' : '多选题';
+    let typeLabel = '单选题';
+    if (question.type === 'multiple') typeLabel = '多选题';
+    if (question.type === 'judge') typeLabel = '判断题';
+    questionTypeTag.textContent = typeLabel;
     questionText.textContent = `${currentIndex + 1}. ${question.question}`;
 
     optionsList.innerHTML = '';
@@ -283,8 +286,12 @@ function showQuestion() {
         const optionEl = document.createElement('div');
         optionEl.className = 'option-item';
         optionEl.dataset.index = index;
+        let label = optionLabels[index];
+        if (question.type === 'judge') {
+            label = index === 0 ? '错' : '对';
+        }
         optionEl.innerHTML = `
-            <span class="option-label">${optionLabels[index]}</span>
+            <span class="option-label">${label}</span>
             <span class="option-text">${option}</span>
         `;
         optionEl.addEventListener('click', () => selectOption(index, optionEl));
@@ -359,15 +366,28 @@ function checkAnswer() {
         resultBanner.className = 'result-banner wrong';
         resultIcon.textContent = '❌';
         resultText.textContent = '回答错误';
+        let yourAnsText, correctAnsTextFull;
+        if (question.type === 'judge') {
+            yourAnsText = selectedOptions.map(i => (i === 1 ? '对' : '错')).join('、');
+            correctAnsTextFull = question.answer.map(i => (i === 1 ? '对' : '错') + '. ' + question.options[i]).join('、');
+        } else {
+            yourAnsText = selectedOptions.map(i => optionLabels[i] + '. ' + question.options[i]).join('、');
+            correctAnsTextFull = question.answer.map(i => optionLabels[i] + '. ' + question.options[i]).join('、');
+        }
         wrongQuestions.push({
             question: question.question,
-            yourAnswer: selectedOptions.map(i => optionLabels[i] + '. ' + question.options[i]).join('、'),
-            correctAnswer: question.answer.map(i => optionLabels[i] + '. ' + question.options[i]).join('、'),
+            yourAnswer: yourAnsText,
+            correctAnswer: correctAnsTextFull,
             explanation: question.explanation
         });
     }
 
-    const correctAnsText = question.answer.map(i => optionLabels[i]).join('、');
+    let correctAnsText;
+    if (question.type === 'judge') {
+        correctAnsText = question.answer.map(i => (i === 1 ? '对' : '错')).join('、');
+    } else {
+        correctAnsText = question.answer.map(i => optionLabels[i]).join('、');
+    }
     correctAnswerEl.innerHTML = `正确答案：<strong>${correctAnsText}</strong>`;
     explanationText.textContent = question.explanation;
 
