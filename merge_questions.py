@@ -7,15 +7,18 @@ with open('questions_second_set.json', 'r', encoding='utf-8') as f:
     new_questions = json.load(f)
 
 print(f'原有题目: {len(old_questions)} 道')
-single_old = sum(1 for q in old_questions if q['type'] == 'single')
-multi_old = sum(1 for q in old_questions if q['type'] == 'multiple')
-print(f'  单选: {single_old}, 多选: {multi_old}')
+types_old = {}
+for q in old_questions:
+    types_old[q['type']] = types_old.get(q['type'], 0) + 1
+for k, v in types_old.items():
+    print(f'  {k}: {v}')
 
 print(f'\n新增题目: {len(new_questions)} 道')
-single_new = sum(1 for q in new_questions if q['type'] == 'single')
-multi_new = sum(1 for q in new_questions if q['type'] == 'multiple')
-judge_new = sum(1 for q in new_questions if q['type'] == 'judge')
-print(f'  单选: {single_new}, 多选: {multi_new}, 判断: {judge_new}')
+types_new = {}
+for q in new_questions:
+    types_new[q['type']] = types_new.get(q['type'], 0) + 1
+for k, v in types_new.items():
+    print(f'  {k}: {v}')
 
 all_questions = old_questions + new_questions
 
@@ -28,10 +31,11 @@ for q in all_questions:
         unique_questions.append(q)
 
 print(f'\n合并后去重: {len(unique_questions)} 道')
-single_all = sum(1 for q in unique_questions if q['type'] == 'single')
-multi_all = sum(1 for q in unique_questions if q['type'] == 'multiple')
-judge_all = sum(1 for q in unique_questions if q['type'] == 'judge')
-print(f'  单选: {single_all}, 多选: {multi_all}, 判断: {judge_all}')
+types_all = {}
+for q in unique_questions:
+    types_all[q['type']] = types_all.get(q['type'], 0) + 1
+for k, v in types_all.items():
+    print(f'  {k}: {v}')
 
 with open('questions.json', 'w', encoding='utf-8') as f:
     json.dump(unique_questions, f, ensure_ascii=False, indent=2)
